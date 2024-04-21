@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "8888:80"
+    depends_on:
+      - node-service
+
+  node-service:
+    build:
+      context: ./api
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    scale: 3
+
+
+  db:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./db-data:/var/lib/mysql
